@@ -140,11 +140,11 @@ func TestClear(t *testing.T) {
 		cache.Set(k, values[i])
 	}
 	if cache.Len() != len(values) {
-		t.Fatalf(errorString, cache.Len(), len(values))
+		t.Fatalf("Got cache length %v but wanted %v", cache.Len(), len(values))
 	}
 	cache.Clear()
 	if cache.Len() != 0 {
-		t.Fatalf("Wanted cache to be empty but it still has %v items", cache.Len())
+		t.Fatalf("Got %v items but wanted cache to be empty", cache.Len())
 	}
 }
 
@@ -250,5 +250,43 @@ func TestItems(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestTickingCache(t *testing.T) {
+	cache := NewTickingCache[int](1 * time.Minute)
+	for _, k := range keys {
+		if _, ok := cache.Get(k); ok {
+			t.Fatalf("Got value for %s but %s should not exist.", k, k)
+		}
+	}
+}
+
+func TestTickingCacheStartAndStop(t *testing.T) {
+	cache := NewTickingCache[int](5 * time.Millisecond)
+	cache.Job = func() {
+		cache.ClearExpired()
+	}
+	values := []int{1, 2, 3}
+	for i, k := range keys {
+		cache.SetToExpire(k, values[i], 1*time.Millisecond)
+	}
+	if cache.Len() != len(values) {
+		t.Fatalf("Got cache length %v but wanted %v", cache.Len(), len(values))
+	}
+	time.Sleep(5 * time.Millisecond)
+	if cache.Len() != 0 {
+		t.Fatalf("Got %v items but wanted cache to be empty", cache.Len())
+	}
+	for i, k := range keys {
+		cache.SetToExpire(k, values[i], 1*time.Millisecond)
+	}
+	if cache.Len() != len(values) {
+		t.Fatalf("Got cache length %v but wanted %v", cache.Len(), len(values))
+	}
+	cache.Stop()
+	time.Sleep(5 * time.Millisecond)
+	if cache.Len() == 0 { // ticker did not stop and items were cleared
+		t.Fatalf("Got empty cache but wanted to have %v items", cache.Len())
 	}
 }

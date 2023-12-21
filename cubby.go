@@ -40,14 +40,14 @@ func (c *Cache[T]) Set(key string, value T) {
 	})
 }
 
-// SetToExpire adds or updates the item value with an expiration date after
-// interval mapped to key in the cache.
-func (c *Cache[T]) SetToExpire(key string, value T, interval time.Duration) {
+// SetToExpire adds or updates the item value with an expiration date equal to
+// the current time + lifetime mapped to key in the cache.
+func (c *Cache[T]) SetToExpire(key string, value T, lifetime time.Duration) {
 	now := time.Now().UTC()
 	c.SetItem(key, Item[T]{
 		Value:     value,
 		CreatedAt: now,
-		ExpiredAt: now.Add(interval),
+		ExpiredAt: now.Add(lifetime),
 	})
 }
 
@@ -115,33 +115,36 @@ func NewCache[T any]() *Cache[T] {
 	}
 }
 
-// TimedCache extends Cache with functionality to routinely delete (sweep)
-// expired items from the cache after a specified interval.
-type TimedCache[T any] struct {
+// TickingCache extends Cache with functionality to process a job at every
+// interval. A common application is to clear expired entries at every tick.
+type TickingCache[T any] struct {
 	*Cache[T]
 	ticker *time.Ticker
+	Job    func()
 }
 
-// StartSweeping clears expired items from the cache at every interval.
-func (tc *TimedCache[T]) StartSweep(interval time.Duration) {
-	tc.ticker = time.NewTicker(interval)
+// Start creates a new ticker and calls job at every tick denoted by duration.
+func (tc *TickingCache[T]) Start(d time.Duration) {
+	tc.ticker = time.NewTicker(d)
 	for range tc.ticker.C {
-		tc.ClearExpired()
+		if tc.Job != nil {
+			tc.Job()
+		}
 	}
 }
 
-// StopSweep stops the started sweeping routine.
-func (tc *TimedCache[T]) StopSweep() {
+// Stop immediately stops ticking to prevent job from being called.
+func (tc *TickingCache[T]) Stop() {
 	if tc.ticker != nil {
 		tc.ticker.Stop()
 	}
 }
 
-// NewTimedCache creates a TimedCache with values of a specified type that
-// clears expired items at every interval.
-func NewTimedCache[T any](interval time.Duration) *TimedCache[T] {
+// NewTickingCache creates a Cache with values of a specified type and starts
+// a new go routine that calls job at every tick denoted by duration.
+func NewTickingCache[T any](d time.Duration) *TickingCache[T] {
 	cache := NewCache[T]()
-	timedCache := &TimedCache[T]{Cache: cache}
-	go timedCache.StartSweep(interval)
+	timedCache := &TickingCache[T]{Cache: cache}
+	go timedCache.Start(d)
 	return timedCache
 }
