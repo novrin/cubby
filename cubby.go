@@ -12,7 +12,7 @@ type Item[T any] struct {
 	ExpiredAt time.Time
 }
 
-// IsExpired returns true if the current time is after the item's explicity set expiration.
+// IsExpired returns true if the current time is after the item's explicitly set expiration.
 func (e *Item[T]) IsExpired() bool {
 	return !e.ExpiredAt.IsZero() && time.Now().UTC().After(e.ExpiredAt)
 }
