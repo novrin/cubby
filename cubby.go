@@ -21,7 +21,7 @@ func (e *Item[T]) IsExpired() bool {
 // for concurrent access.
 type Cache[T any] struct {
 	items map[string]Item[T]
-	mu    sync.Mutex
+	mu    sync.RWMutex
 }
 
 // SetItem adds or updates the item mapped to key in the cache.
@@ -53,8 +53,8 @@ func (c *Cache[T]) SetToExpire(key string, value T, lifetime time.Duration) {
 
 // GetItem retrieves the item mapped to key from the cache.
 func (c *Cache[T]) GetItem(key string) (Item[T], bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	item, ok := c.items[key]
 	return item, ok
 }
@@ -92,8 +92,8 @@ func (c *Cache[T]) ClearExpired() {
 
 // Items returns a copy of the items map.
 func (c *Cache[T]) Items() map[string]Item[T] {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	items := make(map[string]Item[T], len(c.items))
 	for k, v := range c.items {
 		items[k] = v
@@ -103,8 +103,8 @@ func (c *Cache[T]) Items() map[string]Item[T] {
 
 // Len returns the length of the items map in the cache.
 func (c *Cache[T]) Len() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return len(c.items)
 }
 

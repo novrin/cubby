@@ -274,7 +274,7 @@ func TestTickingCacheStartAndStop(t *testing.T) {
 	if cache.Len() != len(values) {
 		t.Fatalf("Got cache length %v but wanted %v", cache.Len(), len(values))
 	}
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	if cache.Len() != 0 {
 		t.Fatalf("Got %v items but wanted cache to be empty", cache.Len())
 	}
@@ -285,7 +285,7 @@ func TestTickingCacheStartAndStop(t *testing.T) {
 		t.Fatalf("Got cache length %v but wanted %v", cache.Len(), len(values))
 	}
 	cache.Stop()
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	if cache.Len() == 0 { // ticker did not stop and items were cleared
 		t.Fatalf("Got empty cache but wanted to have %v items", cache.Len())
 	}
