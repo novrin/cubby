@@ -11,6 +11,7 @@ Use the provided `Cache` to store items of any specified type in a `map[string]I
 * **Type-safe** - ensure all items in the same cache are of the same type
 * **Thread-safe** - avoid unintended effects during concurrent access
 * **In-memory** - eliminate the need to send data over a network
+* **No other dependencies**
 
 
 ### Installation
