@@ -1,4 +1,8 @@
-# cubby ![tests](https://github.com/novrin/cubby/workflows/tests/badge.svg)
+# cubby
+
+[![GoDoc](https://godoc.org/github.com/novrin/cubby?status.svg)](https://pkg.go.dev/github.com/novrin/cubby) 
+![tests](https://github.com/novrin/cubby/workflows/tests/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/novrin/cubby)](https://goreportcard.com/report/github.com/novrin/cubby)
 
 `cubby` is a tiny Go (golang) library for simple, type-safe, thread-safe, in-memory caches.
 
@@ -6,12 +10,11 @@ Use the provided `Cache` to store items of any specified type in a `map[string]I
 
 ### Features
 
-* **Tiny** - less than 200 LOC
+* **Tiny** - less than 200 LOC and no external dependencies
 * **Flexible** - intialize a cache to store any single type
 * **Type-safe** - ensure all items in the same cache are of the same type
 * **Thread-safe** - avoid unintended effects during concurrent access
 * **In-memory** - eliminate the need to send data over a network
-* **No other dependencies**
 
 
 ### Installation
@@ -86,3 +89,9 @@ for i, k := range keys {
 // After 5 minutes, the items above will expire but remain in the cache.
 // They will be removed only after the very first tick (a total of 3hrs later).
 ```
+
+## License
+
+Copyright (c) 2023-present [novrin](https://github.com/novrin)
+
+Licensed under [MIT License](./LICENSE)
