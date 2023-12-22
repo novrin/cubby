@@ -1,19 +1,28 @@
 # cubby ![tests](https://github.com/novrin/cubby/workflows/tests/badge.svg)
 
-A tiny Go (golang) library for simple, type-safe, thread-safe, in-memory caches.
+`cubby` is a tiny Go (golang) library for simple, type-safe, thread-safe, in-memory caches.
 
-Use the provided Cache data type to store items of any specified type in a map[string]Item[T]. Optionally set these items to expire after a specified lifetime.
+Use the provided `Cache` struct to store items of any specified type in a `map[string]Item[T]`. Optionally set these items to expire after a specified lifetime.
+
+## Features
+
+* **Tiny** - less than 200 LOC
+* **Flexible** - intialize a cache to store any single type
+* **Type-safe** - ensure all items in the same cache are of the same type
+* **Thread-safe** - avoid unintended effects during concurrent access
+* **In-memory** - eliminate the need to send data over a network
+
 
 ## Installation
-
-In a Go module
 
 ```shell
 go get github.com/novrin/cubby
 ``` 
 
 ## Usage
-After installing as a library
+**Cache**
+
+The `Cache` struct can be used to store items of ANY specified type.
 
 ```go
 package main
@@ -31,20 +40,20 @@ func main() {
     cache := cubby.NewCache[int]()
 
     // Use Set to map strings to item values.
-	cache.Set("lucky", 7)
-	cache.Set("fav", 8)
+	cache.Set("foo", 7)
+	cache.Set("bar", 8)
 
 	// Use SetToExpire to map strings to item values that expire.
-	cache.SetToExpire("higher", 9, 5*time.Minute)
+	cache.SetToExpire("baz", 9, 5*time.Minute)
 
 	// Use Get to retrieve item values mapped to the given key.
-	foo, ok := cache.Get("lucky")
+	foo, ok := cache.Get("foo")
 	if ok {
 		fmt.Println(foo)
 	}
 
 	// Use Delete to remove items mapped to the given key.
-	cache.Delete("fav")
+	cache.Delete("bar")
 
 	// Use ClearExpired to remove all expired items.
 	cache.ClearExpired()
@@ -53,11 +62,14 @@ func main() {
 	cache.Clear()
 }
 ```
+**TickingCache**
 
-If you want a cache to run a function in routine intervals, you can use the provided TickingCache and assign its Job function. A common use case is to clear expired items at every interval.
+If you want a cache to run a function in timed intervals, you can use the provided `TickingCache` struct and assign its `Job` function. 
+
+A common use case is to clear expired items at every interval:
 
 ```go
-// Use NewTickingCache to instantiate a cache that runs it's Job function
+// Use NewTickingCache to instantiate a cache that runs its Job function
 // at every duration - in this case, 3 hours.
 cache := NewTickingCache[float32](3 * time.Hour)
 
@@ -67,7 +79,7 @@ cache.Job = func() {
     cache.ClearExpired()
 }
 
-keys := []string{"x", "y", "z"}
+keys := []string{"foo", "bar", "baz"}
 values := []float32{3.14, 1.618, 2.718}
 for i, k := range keys {
     cache.SetToExpire(k, values[i], 5*time.Minute)
