@@ -4,7 +4,7 @@
 
 Use the provided `Cache` struct to store items of any specified type in a `map[string]Item[T]`. Optionally set these items to expire after a specified lifetime.
 
-## Features
+### Features
 
 * **Tiny** - less than 200 LOC
 * **Flexible** - intialize a cache to store any single type
@@ -13,14 +13,14 @@ Use the provided `Cache` struct to store items of any specified type in a `map[s
 * **In-memory** - eliminate the need to send data over a network
 
 
-## Installation
+### Installation
 
 ```shell
 go get github.com/novrin/cubby
 ``` 
 
 ## Usage
-**Cache**
+### Cache
 
 The `Cache` struct can be used to store items of ANY specified type.
 
@@ -62,7 +62,8 @@ func main() {
 	cache.Clear()
 }
 ```
-**TickingCache**
+
+### TickingCache
 
 If you want a cache to run a function in timed intervals, you can use the provided `TickingCache` struct and assign its `Job` function. 
 
