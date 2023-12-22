@@ -37,9 +37,9 @@ import (
 )
 
 func main() {
-    cache := cubby.NewCache[int]()
+	cache := cubby.NewCache[int]()
 
-    // Map strings to item values.
+	// Map strings to item values.
 	cache.Set("foo", 7)
 	cache.Set("bar", 8)
 
