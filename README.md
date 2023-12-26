@@ -35,7 +35,7 @@ import (
 	"fmt"
 	"time"
 
-    "github.com/novrin/cubby"
+	"github.com/novrin/cubby"
 )
 
 func main() {
