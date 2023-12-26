@@ -47,7 +47,7 @@ func TestIsExpired(t *testing.T) {
 var keys = []string{"x", "y", "z"}
 
 func TestCache(t *testing.T) {
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for _, k := range keys {
 		if _, ok := cache.Get(k); ok {
 			t.Fatalf("Got value for %s but %s should not exist.", k, k)
@@ -64,7 +64,7 @@ func TestSetItem(t *testing.T) {
 		"future": {Value: 2, CreatedAt: now, ExpiredAt: future},
 		"past":   {Value: 3, CreatedAt: past, ExpiredAt: past},
 	}
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for name, item := range cases {
 		t.Run(name, func(t *testing.T) {
 			cache.SetItem(name, item)
@@ -81,7 +81,7 @@ func TestSet(t *testing.T) {
 		"initial": {1, 2, 3},
 		"updates": {7, 8, 9},
 	}
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for name, nums := range cases {
 		t.Run(name, func(t *testing.T) {
 			for i, k := range keys {
@@ -102,7 +102,7 @@ func TestSetToExpire(t *testing.T) {
 		"hour":   1 * time.Hour,
 		"day":    24 * time.Hour,
 	}
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for name, duration := range cases {
 		t.Run(name, func(t *testing.T) {
 			cache.SetToExpire(name, 1, duration)
@@ -119,7 +119,7 @@ func TestSetToExpire(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	values := []int{1, 2, 3}
 	for i, k := range keys {
 		cache.Set(k, values[i])
@@ -134,7 +134,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	values := []int{1, 2, 3}
 	for i, k := range keys {
 		cache.Set(k, values[i])
@@ -182,7 +182,7 @@ func TestClearExpired(t *testing.T) {
 			want: 0,
 		},
 	}
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			for k, v := range tc.items {
@@ -234,7 +234,7 @@ func TestItems(t *testing.T) {
 			want: 0,
 		},
 	}
-	cache := NewCache[int]()
+	cache := NewCache[string, int]()
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			for k, v := range tc.items {
@@ -254,7 +254,7 @@ func TestItems(t *testing.T) {
 }
 
 func TestTickingCache(t *testing.T) {
-	cache := NewTickingCache[int](1 * time.Minute)
+	cache := NewTickingCache[string, int](1 * time.Minute)
 	for _, k := range keys {
 		if _, ok := cache.Get(k); ok {
 			t.Fatalf("Got value for %s but %s should not exist.", k, k)
@@ -263,7 +263,7 @@ func TestTickingCache(t *testing.T) {
 }
 
 func TestTickingCacheStartAndStop(t *testing.T) {
-	cache := NewTickingCache[int](5 * time.Millisecond)
+	cache := NewTickingCache[string, int](5 * time.Millisecond)
 	cache.Job = func() {
 		cache.ClearExpired()
 	}
