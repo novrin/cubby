@@ -6,16 +6,15 @@
 
 `cubby` is a tiny Go (golang) library for simple, type-safe, thread-safe, in-memory caches.
 
-Use the provided `Cache` to store items of any specified type in a `map[string]Item[T]`. Optionally set these items to expire after a specified lifetime.
+Store values of any type in keys of any comparable type and optionally set them to expire after a specified lifetime.
 
 ### Features
 
-* **Tiny** - less than 200 LOC and no external dependencies
-* **Flexible** - intialize a cache to store any single type
-* **Type-safe** - ensure all items in the same cache are of the same type
+* **Tiny** - less than 150 LOC and no external dependencies
+* **Flexible** - initialize caches with comparable keys and values of any type
+* **Type-safe** - ensure a initialized cache uses consistent key and value types
 * **Thread-safe** - avoid unintended effects during concurrent access
 * **In-memory** - eliminate the need to send data over a network
-
 
 ### Installation
 
@@ -27,7 +26,7 @@ go get github.com/novrin/cubby
 
 ### Cache
 
-A `Cache` can be used to store items of ANY specified type.
+A `Cache` can be used to map keys of ANY comparable type to values of ANY type.
 
 ```go
 package main
@@ -40,7 +39,7 @@ import (
 )
 
 func main() {
-	cache := cubby.NewCache[int]()
+	cache := cubby.NewCache[string, int]()
 
 	// Map strings to item values.
 	cache.Set("foo", 7)
@@ -68,12 +67,12 @@ func main() {
 
 ### TickingCache
 
-A `TickingCache` extends `Cache` with a ticker. It runs an assigned `Job` function in a separate go routine at every tick.
+A `TickingCache` extends `Cache` with a ticker. In a single, new go routine, it runs an assigned `Job` function at every tick.
 
 A common use case is to clear expired items in timed intervals:
 
 ```go
-cache := NewTickingCache[float32](3 * time.Hour)
+cache := cubby.NewTickingCache[string, float32](3 * time.Hour)
 
 // Assign the cache Job function.
 cache.Job = func() {
