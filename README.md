@@ -4,7 +4,7 @@
 ![tests](https://github.com/novrin/cubby/workflows/tests/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/novrin/cubby)](https://goreportcard.com/report/github.com/novrin/cubby)
 
-`cubby` is a tiny Go (golang) library for simple, type-safe, thread-safe, in-memory caches.
+`cubby` is a tiny Go library for simple, type-safe, thread-safe, in-memory caches.
 
 Store values of any type in keys of any comparable type and optionally set them to expire after a specified lifetime.
 
