@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const errorString = "\nGot: %v\nWanted: %v\n"
+const errorString = "\nGot:\t%v\nWanted:\t%v\n"
 
 func TestIsExpired(t *testing.T) {
 	now := time.Now().UTC()
