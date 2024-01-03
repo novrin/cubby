@@ -6,17 +6,19 @@ import (
 	"time"
 )
 
-const errorString = "\nGot:\t%v\nWanted:\t%v\n"
+const errorString = "\nGot:\t%v\nWant:\t%v\n"
+
+var (
+	now    = time.Now()
+	future = now.Add(1 * time.Hour)
+	past   = now.Add(-1 * time.Hour)
+)
 
 func TestIsExpired(t *testing.T) {
-	now := time.Now().UTC()
-	future := now.Add(1 * time.Hour)
-	past := now.Add(-1 * time.Hour)
-	type unit struct {
+	cases := map[string]struct {
 		item Item[int]
 		want bool
-	}
-	cases := map[string]unit{
+	}{
 		"no expiration": {
 			item: Item[int]{Value: 1, CreatedAt: now},
 			want: false,
@@ -30,14 +32,13 @@ func TestIsExpired(t *testing.T) {
 			want: true,
 		},
 	}
-	for name, tc := range cases {
+	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := tc.item.IsExpired()
-			if got != tc.want {
+			if got := c.item.IsExpired(); got != c.want {
 				t.Fatalf(
 					errorString,
 					strconv.FormatBool(got),
-					strconv.FormatBool(tc.want),
+					strconv.FormatBool(c.want),
 				)
 			}
 		})
@@ -56,9 +57,6 @@ func TestCache(t *testing.T) {
 }
 
 func TestSetItem(t *testing.T) {
-	now := time.Now().UTC()
-	future := now.Add(1 * time.Hour)
-	past := now.Add(-1 * time.Hour)
 	cases := map[string]Item[int]{
 		"now":    {Value: 1, CreatedAt: now},
 		"future": {Value: 2, CreatedAt: now, ExpiredAt: future},
@@ -149,14 +147,10 @@ func TestClear(t *testing.T) {
 }
 
 func TestClearExpired(t *testing.T) {
-	now := time.Now().UTC()
-	future := now.Add(1 * time.Hour)
-	past := now.Add(-1 * time.Hour)
-	type unit struct {
+	cases := map[string]struct {
 		items map[string]Item[int]
 		want  int
-	}
-	cases := map[string]unit{
+	}{
 		"none expired": {
 			items: map[string]Item[int]{
 				"noEx1": {Value: 1, CreatedAt: now},
@@ -183,17 +177,17 @@ func TestClearExpired(t *testing.T) {
 		},
 	}
 	cache := NewCache[string, int]()
-	for name, tc := range cases {
+	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			for k, v := range tc.items {
+			for k, v := range c.items {
 				cache.SetItem(k, v)
 			}
-			if cache.Len() != len(tc.items) {
-				t.Fatalf(errorString, cache.Len(), len(tc.items))
+			if cache.Len() != len(c.items) {
+				t.Fatalf(errorString, cache.Len(), len(c.items))
 			}
 			cache.ClearExpired()
-			if cache.Len() != tc.want {
-				t.Fatalf(errorString, cache.Len(), tc.want)
+			if cache.Len() != c.want {
+				t.Fatalf(errorString, cache.Len(), c.want)
 			}
 			cache.Clear()
 		})
@@ -201,14 +195,10 @@ func TestClearExpired(t *testing.T) {
 }
 
 func TestItems(t *testing.T) {
-	now := time.Now().UTC()
-	future := now.Add(1 * time.Hour)
-	past := now.Add(-1 * time.Hour)
-	type unit struct {
+	cases := map[string]struct {
 		items map[string]Item[int]
 		want  int
-	}
-	cases := map[string]unit{
+	}{
 		"none expired": {
 			items: map[string]Item[int]{
 				"noEx1": {Value: 1, CreatedAt: now},
@@ -235,9 +225,9 @@ func TestItems(t *testing.T) {
 		},
 	}
 	cache := NewCache[string, int]()
-	for name, tc := range cases {
+	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
-			for k, v := range tc.items {
+			for k, v := range c.items {
 				cache.SetItem(k, v)
 			}
 			copy := cache.Items()
